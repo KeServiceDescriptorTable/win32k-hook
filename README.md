@@ -1,2 +1,21 @@
-# win32k-hook
-hooking win32k syscalls before they go into win32k drivers.
+# win32k-hook - notahypervisor
+
+## project overview
+
+This is a small part of a larger project which I have not released. This project currently hooks every system call before it goes to win32k drivers.
+
+## how it works
+KiSystemCall64 calls into PsInvokeWin32Callout. Once inside PsInvokeWin32Callout, MmSessionGetWin32Callouts is called to get the win32 callouts which will always return PsWin32CallBack. We locate PsWin32CallBack by signature scanning then grab the callback routine block, which holds the pointer to the function to be called. This is where we swap this out with the address of our own function.
+
+## notes
+i thought this would be patchguard protected. which it is! but with one more detail, patchguard only protects the pointer inside the PsWin32CallBack but not what the pointer actually points too! which is a slight over look.
+
+### support
+
+- windows 10 1507 - windows 11 25h2
+- hvci compliant
+
+## credits
+@KeServiceDescriptorTable
+ida pro
+vmware
