@@ -15,9 +15,12 @@ bool hooks::shutdown() {
 }
 
 bool hooks::win32_syscalls::initialize() {
-	const auto instruction = utils::system::pattern_scan(L"ntoskrnl.exe", "\x48\x8D\x05\x00\x00\x00\x00\x73", "xxx????x");
-	if (!MmIsAddressValid((void*)instruction))
-		return false;
+	auto instruction = utils::system::pattern_scan(L"ntoskrnl.exe", "\x48\x8D\x05\x00\x00\x00\x00\x73", "xxx????x");
+	if (!MmIsAddressValid((void*)instruction)) {
+		instruction = utils::system::pattern_scan(L"ntoskrnl.exe", "\x48\x8D\x05\x00\x00\x00\x00\x48\x0F\x44\xC1\xC3", "xxx????xxxxx");
+		if (!MmIsAddressValid((void*)instruction))
+			return false;
+	}
 
 	const auto rel32 = *(int32_t*)((uint8_t*)instruction + 0x3);
 	const auto* PsWin32CallBack = (PEX_CALLBACK)(instruction + rel32 + 7);
@@ -37,4 +40,5 @@ bool hooks::win32_syscalls::shutdown() {
 	ex_callback_routine_block = nullptr;
 
 	return true;
+
 }
