@@ -37,6 +37,16 @@ bool utils::physical_memory::write(void* src, void* dst, const size_t size,
     return true;
 }
 
+bool utils::physical_memory::read(void* src, void* dst, const size_t size) {
+    uint64_t bytes_transfered = 0;
+    return read(src, dst, size, &bytes_transfered);
+}
+
+bool utils::physical_memory::write(void* src, void* dst, const size_t size) {
+    return write(src, dst, size, 
+        nullptr);
+}
+
 void* utils::physical_memory::get_physical_for_virtual(void* virtual_address) {
     return (void*)MmGetPhysicalAddress(virtual_address).QuadPart;
 }
@@ -63,8 +73,18 @@ bool utils::virtual_memory::write(void* src, void* dst, const size_t size,
         return false;
 
     MM_COPY_ADDRESS mm_copy_address = {};
-    mm_copy_address.VirtualAddress = dst;
-    return NT_SUCCESS(MmCopyMemory(src, mm_copy_address, size,
+    mm_copy_address.VirtualAddress = src;
+    return NT_SUCCESS(MmCopyMemory(dst, mm_copy_address, size,
         MM_COPY_MEMORY_VIRTUAL,
         bytes_transferred));
+}
+
+bool utils::virtual_memory::read(void* src, void* dst, const size_t size) {
+    uint64_t bytes_transfered = 0;
+    return read(src, dst, size, &bytes_transfered);
+}
+
+bool utils::virtual_memory::write(void* src, void* dst, const size_t size) {
+    uint64_t bytes_transfered = 0;
+    return write(src, dst, size, &bytes_transfered);
 }
