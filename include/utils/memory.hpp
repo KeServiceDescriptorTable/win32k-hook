@@ -15,6 +15,10 @@ namespace utils {
 		static bool write(void* src, void* dst, const size_t size,
 			size_t* bytes_transferred);
 
+		static bool read(void* src, void* dst, const size_t size);
+
+		static bool write(void* src, void* dst, const size_t size);
+
 		static void* get_physical_for_virtual(void* virtual_address);
 
 		static void* get_virtual_for_physical(void* physical_address);
@@ -22,8 +26,8 @@ namespace utils {
 		template <typename T>
 		static inline T read(void* src) {
 			T buffer = {};
-			if (!read(src, &buffer, sizeof(T),
-				nullptr))
+			size_t b = 0;
+			if (!read(src, &buffer, sizeof(T)))
 				return T{};
 
 			return buffer;
@@ -52,6 +56,10 @@ namespace utils {
 
 		static bool write(void* src, void* dst, const size_t size,
 			size_t* bytes_transferred);
+
+		static bool read(void* src, void* dst, const size_t size);
+
+		static bool write(void* src, void* dst, const size_t size);
 
 		template <typename T>
 		static inline T read(void* src) {
