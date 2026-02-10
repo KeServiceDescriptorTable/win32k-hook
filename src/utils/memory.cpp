@@ -5,11 +5,18 @@ bool utils::physical_memory::read(void* src, void* dst, const size_t size,
     if (!src || !dst || !size)
         return false;
 
+    size_t temp_bytes_transferred = 0;
+
     MM_COPY_ADDRESS mm_copy_address = {};
     mm_copy_address.PhysicalAddress.QuadPart = (uint64_t)src;
-    return NT_SUCCESS(MmCopyMemory(dst, mm_copy_address, size,
+    const auto status = NT_SUCCESS(MmCopyMemory(dst, mm_copy_address, size,
         MM_COPY_MEMORY_PHYSICAL,
-        bytes_transferred));
+        &temp_bytes_transferred));
+
+    if (bytes_transferred)
+        *bytes_transferred = temp_bytes_transferred;
+
+    return status;
 }
 
 bool utils::physical_memory::write(void* src, void* dst, const size_t size,
@@ -38,8 +45,7 @@ bool utils::physical_memory::write(void* src, void* dst, const size_t size,
 }
 
 bool utils::physical_memory::read(void* src, void* dst, const size_t size) {
-    uint64_t bytes_transfered = 0;
-    return read(src, dst, size, &bytes_transfered);
+    return read(src, dst, size, nullptr);
 }
 
 bool utils::physical_memory::write(void* src, void* dst, const size_t size) {
