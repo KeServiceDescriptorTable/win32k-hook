@@ -6,6 +6,7 @@ This is a small part of a larger project which I have not released. This project
 
 ## how it works
 KiSystemCall64 calls into PsInvokeWin32Callout. Once inside PsInvokeWin32Callout, MmSessionGetWin32Callouts is called to get the win32 callouts which will always return PsWin32CallBack. We locate PsWin32CallBack by signature scanning then grab the callback routine block, which holds the pointer to the function to be called. This is where we swap this out with the address of our own function.
+We become the middle man between the syscall and W32CalloutDispatchThunk which lives inside win32k.sys
 
 ## notes
 i thought this would be patchguard protected. which it is! but with one more detail, patchguard only protects the pointer inside the PsWin32CallBack but not what the pointer actually points too! which is a slight over look. also pretty sure that the hook will be called twice for one syscall.
